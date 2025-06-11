@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:portfolio_app/core/string.dart';
 import 'package:portfolio_app/core/ui.dart';
 import 'package:portfolio_app/data/chatroom_model.dart';
+import 'package:portfolio_app/logic/functions.dart';
 import 'package:portfolio_app/presentation/screen/home.dart';
 import 'package:portfolio_app/presentation/screen/login.dart';
 import 'package:portfolio_app/presentation/widget/chat/chat_messages.dart';
@@ -22,36 +23,25 @@ class _ChatScreenState extends State<ChatScreen> {
   var _username = "User";
   var _email = "";
 
-  getUserName() async {
-    try {
-      await _fireStore.collection(userCollectionName).get().then(
-        (querySnapShot) {
-          for (var queryData in querySnapShot.docs) {
-            // print("queryData ${queryData.id}");
-            if (queryData.id == FirebaseAuth.instance.currentUser!.uid) {
-              setState(() {
-                _username =
-                    queryData.data()[userCollectionUsernameNode].toString();
-                _email = queryData.data()[userCollectionEmailNode].toString();
-              });
-
-              break;
-            }
-            // if (queryData[userCollectionEmailNode] ==
-            //     FirebaseAuth.instance.currentUser!.uid) {}
-          }
-        },
-      );
-    } on FirebaseException catch (e) {
-      print("Errorr ..........  $e");
-    }
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getUserName();
+    getUserName().then(
+      (name) {
+        print(" Namejkskjdhsc $name");
+        setState(() {
+          _username = name;
+        });
+      },
+    );
+    getUserEmail().then(
+      (email) {
+        setState(() {
+          _email = email;
+        });
+      },
+    );
   }
 
   @override
@@ -80,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   _username,
                   style: Theme.of(context)
                       .textTheme
-                      .bodyMedium!
+                      .bodySmall!
                       .copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -108,6 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
             // ],
           ),
           body: Container(
+            padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                   colors: [
@@ -123,8 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                     child: ChatMessages(
-                  chatroom: widget.chatroom,
-                )),
+                        chatroom: widget.chatroom, username: _username)),
                 NewMessages(
                   chatroom: widget.chatroom,
                 )

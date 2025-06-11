@@ -54,9 +54,14 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } on FirebaseException catch (e) {
+      // String msg = "Authentication Failed";
+      // if (e.code == "invalid-credentials") {
+      //   msg = "Credentials are wrong";
+      // }
+      print(e.message);
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? "Authentication Failed")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Authentication Failed")));
     }
   }
 
@@ -208,7 +213,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+
                 const VerticalSpacer(),
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.pop(context);
+                //   },
+                //   child: Row(
+                //     mainAxisSize: MainAxisSize.min,
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Icon(
+                //         Icons.chevron_left_rounded,
+                //         color: ColorConstant.primaryColor.withOpacity(0.5),
+                //         size: 15,
+                //       ),
+                //       Text(
+                //         " Back to home",
+                //         style: kTextTheme.displaySmall!.copyWith(
+                //             color: ColorConstant.primaryColor.withOpacity(0.5)),
+                //       )
+                //     ],
+                //   ),
+                // ),
+                // const VerticalSpacer(),
               ]),
         ),
       ),

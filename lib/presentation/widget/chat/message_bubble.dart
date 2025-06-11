@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:portfolio_app/core/ui.dart';
 
 // A MessageBubble for showing a single chat message on the ChatScreen.
@@ -7,7 +8,7 @@ class MessageBubble extends StatelessWidget {
   const MessageBubble.first({
     super.key,
     this.userImage = "https://cdn-icons-png.flaticon.com/512/219/219983.png",
-    this.username = null,
+    required this.username,
     required this.message,
     required this.isMe,
   }) : isFirstInSequence = true;
@@ -46,17 +47,15 @@ class MessageBubble extends StatelessWidget {
 
     return Stack(
       children: [
-        if (userImage != null)
+        if (username != null)
           Positioned(
             top: 15,
             // Align user image to the right, if the message is from me.
             right: isMe ? 0 : null,
             child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                userImage!,
-              ),
-              backgroundColor: theme.colorScheme.primary.withAlpha(180),
-              radius: 23,
+              child:  Text(isMe ? username![0] : "G"),
+              backgroundColor: ColorConstant.primaryColor.withOpacity(0.5),
+              radius: 15,
             ),
           ),
         Container(
@@ -75,24 +74,24 @@ class MessageBubble extends StatelessWidget {
                   // First messages in the sequence provide a visual buffer at
                   // the top.
                   if (isFirstInSequence) const SizedBox(height: 18),
-                  if (username != null)
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 13,
-                        right: 13,
-                      ),
-                      child: Text(
-                        username!,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                    ),
+                  // if (username != null)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(
+                  //       left: 13,
+                  //       right: 13,
+                  //     ),
+                  //     child: Text(
+                  //       username!,
+                  //       style: Theme.of(context).textTheme.bodySmall,
+                  //     ),
+                  //   ),
 
                   // The "speech" box surrounding the message.
                   Container(
                     decoration: BoxDecoration(
                       color: isMe
-                          ? ColorConstant.greyColor
-                          : theme.colorScheme.secondary.withAlpha(200),
+                          ? ColorConstant.scaffolfBgPrimaryColor
+                          : ColorConstant.greyColor,
                       // Only show the message bubble's "speaking edge" if first in
                       // the chain.
                       // Whether the "speaking edge" is on the left or right depends
@@ -123,16 +122,13 @@ class MessageBubble extends StatelessWidget {
                     ),
                     child: Text(
                       message,
-                      style: theme.textTheme.bodySmall!
-                          .copyWith(fontWeight: FontWeight.w400),
-                      //  TextStyle(
-                      //   // Add a little line spacing to make the text look nicer
-                      //   // when multilined.
-                      //   height: 1.3,
-                      //   color: isMe
-                      //       ? Colors.black87
-                      //       : theme.colorScheme.onSecondary,
-                      // ),
+                      style: TextStyle(
+                          // Add a little line spacing to make the text look nicer
+                          // when multilined.
+                          height: 1.3,
+                          color: isMe
+                              ? ColorConstant.whiteColor
+                              : ColorConstant.primaryColor),
                       softWrap: true,
                     ),
                   ),

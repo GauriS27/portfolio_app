@@ -6,8 +6,9 @@ import 'package:portfolio_app/data/chatroom_model.dart';
 import 'package:portfolio_app/presentation/widget/chat/message_bubble.dart';
 
 class ChatMessages extends StatelessWidget {
-  ChatMessages({required this.chatroom, super.key});
+  ChatMessages({required this.chatroom, required this.username, super.key});
   ChatroomModel chatroom;
+  String username;
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
@@ -49,17 +50,23 @@ class ChatMessages extends StatelessWidget {
               final nextmsg = index == loadedMsg.length - 1
                   ? currentmsg
                   : loadedMsg[index + 1];
-              return currentmsg.data()[chatMessageSenderIdNode] !=
-                      nextmsg.data()[chatMessageSenderIdNode]
+              return index == loadedMsg.length - 1
                   ? MessageBubble.first(
-                      // username: "ahdksjhd",
+                      username: username,
                       message: currentmsg.data()[chatMessageTextNode],
                       isMe: currentmsg.data()[chatMessageSenderIdNode] ==
                           user.uid)
-                  : MessageBubble.next(
-                      message: currentmsg.data()[chatMessageTextNode],
-                      isMe: currentmsg.data()[chatMessageSenderIdNode] ==
-                          user.uid);
+                  : currentmsg.data()[chatMessageSenderIdNode] !=
+                          nextmsg.data()[chatMessageSenderIdNode]
+                      ? MessageBubble.first(
+                          username: username,
+                          message: currentmsg.data()[chatMessageTextNode],
+                          isMe: currentmsg.data()[chatMessageSenderIdNode] ==
+                              user.uid)
+                      : MessageBubble.next(
+                          message: currentmsg.data()[chatMessageTextNode],
+                          isMe: currentmsg.data()[chatMessageSenderIdNode] ==
+                              user.uid);
             });
       },
     );

@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio_app/core/string.dart';
 import 'package:portfolio_app/core/ui.dart';
 import 'package:portfolio_app/data/chatroom_model.dart';
+import 'package:portfolio_app/logic/functions.dart';
 import 'package:portfolio_app/presentation/screen/chat.dart';
+import 'package:portfolio_app/presentation/screen/login.dart';
 import 'package:portfolio_app/presentation/widget/experience_timeine.dart';
 import 'package:portfolio_app/presentation/widget/vertical_spacer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,7 +16,6 @@ import 'package:uuid/uuid.dart';
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
   var uuid = Uuid();
-  var currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
   final List<String> skills = [
     "Dart",
@@ -31,6 +32,8 @@ class HomeScreen extends StatelessWidget {
   ];
 
   Future<ChatroomModel> getChatRoom() async {
+    var currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
     ChatroomModel chatroom;
 
     /// check in firebase that does there any chatroom exists with senderId
@@ -46,14 +49,16 @@ class HomeScreen extends StatelessWidget {
       chatroom = ChatroomModel.fromMap(dataMap as Map<String, dynamic>);
       print("Chatroom exists");
     } else {
-      /// create new chatroom
-      ChatroomModel newchatroom =
-          ChatroomModel(chatroomId: uuid.v1(), participantId: currentUserId);
+      ChatroomModel newchatroom;
+      var username = await getUserName();
+      newchatroom = ChatroomModel(
+          chatroomId: uuid.v1(),
+          participantId: currentUserId,
+          participantName: username);
       await FirebaseFirestore.instance
           .collection(chatCollection)
           .doc(newchatroom.chatroomId)
           .set(newchatroom.toMap());
-
       chatroom = newchatroom;
       print("CHatroom created");
     }
@@ -323,15 +328,29 @@ class HomeScreen extends StatelessWidget {
             ),
             onPressed: () async {
               /// check if chatroom already exists
-              ChatroomModel chatroom = await getChatRoom();
-              print(chatroom.participantId);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                      chatroom: chatroom,
-                    ),
-                  ));
+              var currentUser = FirebaseAuth.instance.currentUser;
+              if (currentUser != null) {
+                ChatroomModel chatroom = await getChatRoom();
+                print(chatroom.participantId);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        chatroom: chatroom,
+                      ),
+                    ));
+              } else {
+                var snackBar = SnackBar(
+                    duration: Duration(seconds: 1),
+                    content: Text('Kindly login to continue chat'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ));
+              }
             },
           ),
         ),
